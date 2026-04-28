@@ -1,9 +1,11 @@
+name: pos-online
+
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
-    container_name: pos-online-app
+    container_name: pos-online_app
     restart: unless-stopped
     working_dir: /var/www/html
     volumes:
@@ -16,7 +18,7 @@ services:
 
   nginx:
     image: nginx:alpine
-    container_name: pos-online-nginx
+    container_name: pos-online_nginx
     restart: unless-stopped
     ports:
       - "8080:80"
@@ -30,7 +32,7 @@ services:
 
   mysql:
     image: mysql:8.0
-    container_name: pos-online-mysql
+    container_name: pos-online_mysql
     restart: unless-stopped
     environment:
       MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
@@ -46,12 +48,27 @@ services:
 
   redis:
     image: redis:alpine
-    container_name: pos-online-redis
+    container_name: pos-online_redis
     restart: unless-stopped
     ports:
       - "6379:6379"
     networks:
       - pos-online-network
+
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: pos-online_phpmyadmin
+    restart: unless-stopped
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: ${DB_ROOT_PASSWORD:-rootpassword}
+    networks:
+      - pos-online-network
+    depends_on:
+      - mysql
 
 networks:
   pos-online-network:
