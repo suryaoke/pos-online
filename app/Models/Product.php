@@ -4,24 +4,26 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ProductCategory extends Model
+class Product extends Model
 {
     protected $fillable = [
+        'product_category_id',
         'image',
         'name',
-        'description'
+        'price',
+        'stock'
     ];
+
+    public function category()
+    {
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
+    }
 
     public function scopeSearch($query, $search)
     {
 
         return $query->when($search, function ($query, $search) {
-            $query->where('name', 'like', "%{$search}");
+            $query->where('name', 'like', "%{$search}%");
         });
-    }
-
-    public function products()
-    {
-        return $this->hasMany(Product::class, 'product_category_id');
     }
 }
